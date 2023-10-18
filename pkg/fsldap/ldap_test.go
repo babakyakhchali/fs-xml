@@ -58,7 +58,7 @@ func TestLdap(t *testing.T) {
 	})
 	//fmt.Printf("domain is %v", domain)
 
-	section := fsxml.Section{Name: "directory", Domain: []fsxml.Domain{domain}}
+	section := fsxml.Section{Name: "directory", Domains: &[]fsxml.Domain{domain}}
 
 	out, _ := xml.MarshalIndent(section, " ", "  ")
 	r := regexp.MustCompile("></[a-zA-Z0-9]*>")

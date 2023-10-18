@@ -40,10 +40,19 @@ type CreateDomainOptions struct {
 	SipUsernameField   string
 	SipPasswordField   string
 	ExtraFieldMappings map[string]string
+	DomainVars         map[string]string
+	DomainParams       map[string]string
+	UserVars           map[string]string
 }
 
 func CreateDomain(users []*ldap.Entry, groups []*ldap.Entry, opts CreateDomainOptions) fsxml.Domain {
 	domain := fsxml.Domain{Name: opts.DomainName, Groups: []fsxml.Group{}}
+	for name, value := range opts.DomainParams {
+		domain.Variables = append(domain.Variables, fsxml.Variable{Name: name, Value: value})
+	}
+	for name, value := range opts.DomainParams {
+		domain.Params = append(domain.Params, fsxml.Param{Name: name, Value: value})
+	}
 	sipPasswordAttr := ""
 	if opts.SipPasswordField != "" {
 		sipPasswordAttr = opts.SipPasswordField
@@ -114,7 +123,7 @@ func CreateDomainFromLDAP(opts CreateDomainFromLDAPOpts) (xmlstring string, err 
 
 	domain := CreateDomain(users.Entries, groups.Entries, opts.CreateDomainOptions)
 
-	section := fsxml.Section{Name: "directory", Domain: []fsxml.Domain{domain}}
+	section := fsxml.Section{Name: "directory", Domains: &[]fsxml.Domain{domain}}
 
 	out, _ := xml.MarshalIndent(section, " ", "  ")
 	r := regexp.MustCompile("></[a-zA-Z0-9]*>")

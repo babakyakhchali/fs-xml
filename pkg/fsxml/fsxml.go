@@ -2,11 +2,41 @@ package fsxml
 
 import "encoding/xml"
 
-type Section struct {
-	XMLName xml.Name `xml:"section" json:"section,omitempty"`
-	Text    string   `xml:",chardata" json:"text,omitempty"`
+type FreeswitchDocument struct {
+	XMLName       xml.Name `xml:"document" json:"document,omitempty"`
+	XPreProcesses []XPreProcess
+	Sections      []Section //`xml:"section" json:"section,omitempty"`
+	Type          string    `xml:"type,attr" json:"type,omitempty"`
+}
+
+type Configuration struct {
+	XMLName  xml.Name  `xml:"configuration" json:"configuration,omitempty"`
+	Name     string    `xml:"name,attr" json:"name,omitempty"`
+	Settings *Settings //`xml:"settings" json:"settings,omitempty"`
+}
+
+type Context struct {
+	XMLName xml.Name `xml:"context" json:"context,omitempty"`
 	Name    string   `xml:"name,attr" json:"name,omitempty"`
-	Domain  []Domain `xml:"domain" json:"domain,omitempty"`
+}
+
+type Section struct {
+	XMLName        xml.Name         `xml:"section" json:"section,omitempty"`
+	Text           string           `xml:",chardata" json:"text,omitempty"`
+	Name           string           `xml:"name,attr" json:"name,omitempty"`
+	Domains        *[]Domain        //`xml:"domain" json:"domain,omitempty"`
+	Configurations *[]Configuration //`xml:"configuration" json:"configuration,omitempty"`
+	Contexts       *[]Context       `xml:"context" json:"context,omitempty"`
+}
+
+type Settings struct {
+	XMLName xml.Name `xml:"settings" json:"settings,omitempty"`
+	Params  []Param  `xml:"params" json:"params,omitempty"`
+}
+
+type Variables struct {
+	XMLName   xml.Name   `xml:"variables" json:"variables,variables"`
+	Variables []Variable `xml:"variable" json:"variable,variable"`
 }
 
 type Domain struct {
@@ -40,4 +70,11 @@ type Variable struct {
 	XMLName xml.Name `xml:"variable" json:"variable,omitempty"`
 	Name    string   `xml:"name,attr" json:"name,omitempty"`
 	Value   string   `xml:"value,attr" json:"value,omitempty"`
+}
+
+// <X-PRE-PROCESS cmd="set" data="internal_ip=127.0.0.1"/>
+type XPreProcess struct {
+	XMLName xml.Name `xml:"X-PRE-PROCESS" json:"X-PRE-PROCESS,omitempty"`
+	Cmd     string   `xml:"cmd,attr" json:"cmd,omitempty"`
+	Data    string   `xml:"data,attr" json:"data,omitempty"`
 }

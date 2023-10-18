@@ -25,9 +25,30 @@ func TestToXML(t *testing.T) {
 
 	domain := fsxml.Domain{Name: "$${local_ip_v4}", Groups: []fsxml.Group{group}}
 
-	section := fsxml.Section{Name: "directory", Domain: []fsxml.Domain{domain}}
+	directory := fsxml.Section{Name: "directory", Domains: &[]fsxml.Domain{domain}}
 
-	out, _ := xml.MarshalIndent(section, " ", "  ")
+	configuration := fsxml.Section{Name: "configuration", Configurations: &[]fsxml.Configuration{
+		{
+			Name: "event_socket.conf",
+			Settings: &fsxml.Settings{
+				Params: []fsxml.Param{
+					{Name: "listen-ip", Value: "127.0.0.1"},
+				},
+			},
+		},
+	}}
+
+	dialplan := fsxml.Section{Name: "dialplan"}
+
+	fsdoc := fsxml.FreeswitchDocument{
+		XPreProcesses: []fsxml.XPreProcess{{Cmd: "set", Data: "internal_ip=127.0.0.1"}},
+		Sections:      []fsxml.Section{directory, configuration, dialplan}, Type: "freeswitch/xml"}
+
+	out, err := xml.MarshalIndent(fsdoc, " ", "  ")
+	if err != nil {
+		t.Fatalf("failed to unmarshal, error:%s", err)
+		return
+	}
 	r := regexp.MustCompile("></[a-zA-Z0-9]*>")
 	ns := r.ReplaceAllString(string(out), "/>")
 	fmt.Println(ns)

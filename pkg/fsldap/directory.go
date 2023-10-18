@@ -70,6 +70,7 @@ func CreateDomain(users []*ldap.Entry, groups []*ldap.Entry, opts CreateDomainOp
 		for varName, varAttr := range opts.ExtraFieldMappings {
 			xmlUser.Variables = append(xmlUser.Variables, fsxml.Variable{Name: varName, Value: ldapUser.GetAttributeValue(varAttr)})
 		}
+		xmlUser.Variables = append(xmlUser.Variables, fsxml.Variable{Name: "source", Value: "ldap"})
 		addUserToGroup(&domain, "default", xmlUser, false)
 		userLdapGroups := ldapUser.GetAttributeValues("memberOf")
 		for _, gs := range userLdapGroups {
